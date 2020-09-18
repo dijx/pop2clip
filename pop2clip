@@ -1,0 +1,106 @@
+#!/bin/env python
+import pip
+import sys
+
+packages_required = ['pyperclip']
+
+for p in packages_required:
+    try:
+        __import__(p)
+    except ImportError:
+        print('Installing %s' % p)
+        pip.main(['install', p])
+
+import pyperclip
+
+
+supported_params = ['-l','-u','-c','-C','-s','-t','-h']
+help_content =\
+    "Supported parameters:\n" \
+    " -l text to lowercase\n" \
+    " -u text to uppercase\n" \
+    " -c capitalize text\n" \
+    " -C casefold text\n" \
+    " -s swap case\n" \
+    " -t tile\n" \
+    " -h this help"
+
+'''
+# use stdin if it's full
+if not sys.stdin.isatty():
+    input_stream = sys.stdin
+
+# otherwise, read the given filename
+else:
+    try:
+        input_filename = sys.argv[1]
+    except IndexError:
+        message = 'need filename as first argument if stdin is not full'
+        raise IndexError(message)
+    else:
+        input_stream = open(input_filename, 'rU')
+
+for line in input_stream:
+    print(line) # do something useful with each line
+'''
+
+def read_stdin():
+    if not sys.stdin.isatty():
+        text = sys.stdin
+        return text
+
+def process_arguments(arguments):
+
+    if len(arguments) < 2:
+        return (None, "")
+
+    else:
+        my_parm = arguments[1]
+        if my_parm not in supported_params:
+            text = arguments[1::]
+            my_parm = None
+        else:
+            text = arguments[2::]
+##        print(my_parm, text)
+        return (my_parm, text)
+
+def process_text(my_parm, text):
+    try:
+        text = ' '.join(map(str, text))
+    except Exception as ex:
+        print(ex)
+
+    if my_parm == '-u':
+        text = text.upper()
+    elif my_parm == '-l':
+        text = text.lower()
+    elif my_parm == '-c':
+        text = text.capitalize()
+    elif my_parm == '-C':
+        text = text.casefold()
+    elif my_parm == '-s':
+        text = text.swapcase()
+    elif my_parm == '-t':
+        text = text.title()
+
+    pyperclip.copy(text)
+    print("\n%s\n"%text)
+
+    if my_parm == '-h':
+        text = help_content
+        print(text)
+
+
+def main():
+
+    my_parm, text = process_arguments(sys.argv)
+    if len(text) < 1:
+        text = read_stdin()
+
+    process_text(my_parm, text)
+
+if __name__ == '__main__':
+    main()
+
+
+
