@@ -61,7 +61,7 @@ def process_arguments(arguments):
             my_parm = None
         else:
             text = arguments[2::]
-##        print(my_parm, text)
+#        print(my_parm, text)
         return (my_parm, text)
 
 def process_text(my_parm, text):
@@ -70,21 +70,18 @@ def process_text(my_parm, text):
     except Exception as ex:
         print(ex)
 
-    if my_parm == '-u':
-        text = text.upper()
-    elif my_parm == '-l':
-        text = text.lower()
-    elif my_parm == '-c':
-        text = text.capitalize()
-    elif my_parm == '-C':
-        text = text.casefold()
-    elif my_parm == '-s':
-        text = text.swapcase()
-    elif my_parm == '-t':
-        text = text.title()
-
-    pyperclip.copy(text)
-    print("\n%s\n"%text)
+    text_mapping = {'-u': text.upper(),
+                    '-l': text.lower(),
+                    '-c': text.capitalize(),
+                    '-s': text.swapcase(),
+                    '-t': text.title(),
+                    None: text
+                    }
+    try:
+        pyperclip.copy(text_mapping.get(my_parm))
+    except pyperclip.PyperclipException as err:
+        print("Clipboard not available\n%s"%err)
+    print("\n%s\n"%text_mapping.get(my_parm))
 
     if my_parm == '-h':
         text = help_content
@@ -97,7 +94,10 @@ def main():
     if len(text) < 1:
         text = read_stdin()
 
-    process_text(my_parm, text)
+    if text:
+        process_text(my_parm, text)
+    else:
+        print("No text processed")
 
 if __name__ == '__main__':
     main()
