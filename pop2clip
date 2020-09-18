@@ -81,6 +81,8 @@ def process_text(my_parm, text):
         pyperclip.copy(text_mapping.get(my_parm))
     except pyperclip.PyperclipException as err:
         print("Clipboard not available\n%s"%err)
+    except OSError as err:
+        print(err)
     print("\n%s\n"%text_mapping.get(my_parm))
 
     if my_parm == '-h':
